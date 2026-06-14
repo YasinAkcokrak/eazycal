@@ -1,33 +1,4 @@
-import NextAuth from "next-auth"
-import { authConfig } from "@/lib/auth.config"
-import { NextResponse } from "next/server"
-
-const { auth } = NextAuth(authConfig)
-
-export default auth((req) => {
-  const { nextUrl, auth: session } = req
-  const isLoggedIn = !!session
-
-  const isAuthPage = nextUrl.pathname.startsWith("/login") || nextUrl.pathname.startsWith("/register")
-  const isAdminPage = nextUrl.pathname.startsWith("/admin")
-  const isAppPage = ["/dashboard", "/scan", "/history", "/goals", "/profile"].some(
-    (p) => nextUrl.pathname.startsWith(p),
-  )
-
-  if (isAuthPage && isLoggedIn) {
-    return NextResponse.redirect(new URL("/dashboard", nextUrl))
-  }
-
-  if ((isAppPage || isAdminPage) && !isLoggedIn) {
-    return NextResponse.redirect(new URL("/login", nextUrl))
-  }
-
-  if (isAdminPage && session?.user?.role !== "ADMIN") {
-    return NextResponse.redirect(new URL("/dashboard", nextUrl))
-  }
-
-  return NextResponse.next()
-})
+export { default } from "next-auth/middleware"
 
 export const config = {
   matcher: [
@@ -37,7 +8,5 @@ export const config = {
     "/goals/:path*",
     "/profile/:path*",
     "/admin/:path*",
-    "/login",
-    "/register",
   ],
 }
