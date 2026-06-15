@@ -3,7 +3,11 @@ import type { NextRequest } from "next/server"
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
-  const sessionToken = request.cookies.get("next-auth.session-token") || request.cookies.get("__Secure-next-auth.session-token")
+  const sessionToken =
+    request.cookies.get("authjs.session-token") ||
+    request.cookies.get("__Secure-authjs.session-token") ||
+    request.cookies.get("next-auth.session-token") ||
+    request.cookies.get("__Secure-next-auth.session-token")
 
   const protectedPaths = ["/dashboard", "/scan", "/history", "/goals", "/profile", "/admin"]
   const isProtected = protectedPaths.some(path => pathname.startsWith(path))
