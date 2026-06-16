@@ -27,6 +27,26 @@ enum Confidence {
   LOW
 }
 
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum ActivityLevel {
+  SEDENTARY
+  LIGHT
+  MODERATE
+  ACTIVE
+  VERY_ACTIVE
+}
+
+enum GoalType {
+  LOSE_WEIGHT
+  MAINTAIN
+  GAIN_MUSCLE
+}
+
 // ─── User ────────────────────────────────────────────
 
 model User {
@@ -45,6 +65,7 @@ model User {
   sessions Session[]
   meals    Meal[]
   goal     Goal?
+  profile  UserProfile?
 }
 
 // ─── NextAuth ────────────────────────────────────────
@@ -117,6 +138,24 @@ model Goal {
   fatG          Float?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ─── UserProfile ─────────────────────────────────────
+
+model UserProfile {
+  id                String        @id @default(cuid())
+  userId            String        @unique
+  age               Int
+  gender            Gender
+  weightKg          Float
+  heightCm          Float
+  activityLevel     ActivityLevel
+  weeklyWorkoutDays Int
+  goalType          GoalType
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

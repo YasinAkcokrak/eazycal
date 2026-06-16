@@ -6,7 +6,7 @@ export default async function ProfilePage() {
   const session = await auth()
   const userId = session!.user.id
 
-  const [user, allMeals, topTypeResult] = await Promise.all([
+  const [user, allMeals, topTypeResult, userProfile] = await Promise.all([
     prisma.user.findUnique({
       where: { id: userId },
       select: { id: true, name: true, email: true, image: true, createdAt: true, password: true },
@@ -22,6 +22,7 @@ export default async function ProfilePage() {
       orderBy: { _count: { id: "desc" } },
       take: 1,
     }),
+    prisma.userProfile.findUnique({ where: { userId } }),
   ])
 
   const daysTracked = new Set(allMeals.map((m) => m.loggedAt.toISOString().slice(0, 10))).size
@@ -43,6 +44,15 @@ export default async function ProfilePage() {
         totalCalories,
         topMealType: topTypeResult[0]?.mealType ?? null,
       }}
+      userProfile={userProfile ? {
+        age: userProfile.age,
+        gender: userProfile.gender,
+        weightKg: userProfile.weightKg,
+        heightCm: userProfile.heightCm,
+        activityLevel: userProfile.activityLevel,
+        weeklyWorkoutDays: userProfile.weeklyWorkoutDays,
+        goalType: userProfile.goalType,
+      } : null}
     />
   )
 }
