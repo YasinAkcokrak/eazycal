@@ -139,8 +139,8 @@ export default function DashboardClient({ meals, totals, goal, date }: Props) {
                       <div className="relative h-14 w-14 rounded-md overflow-hidden shrink-0">
                         <Image
                           src={
-                            meal.imageUrl.startsWith("http")
-                              ? meal.imageUrl
+                            meal.imageUrl.includes("blob.vercel-storage.com")
+                              ? `/api/images?url=${encodeURIComponent(meal.imageUrl)}`
                               : `/api/images/${meal.imageUrl}`
                           }
                           alt={meal.name}

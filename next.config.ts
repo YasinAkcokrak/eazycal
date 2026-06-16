@@ -12,6 +12,7 @@ const nextConfig: NextConfig = {
   turbopack: {},
   images: {
     localPatterns: [
+      { pathname: "/api/images", search: "*" },
       { pathname: "/api/images/**" },
     ],
     remotePatterns: [
