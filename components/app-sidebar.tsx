@@ -3,10 +3,16 @@
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { signOut } from "next-auth/react"
-import { LayoutDashboard, Camera, History, Target, User, LogOut, ShieldCheck, Globe } from "lucide-react"
+import { LayoutDashboard, Camera, History, Target, User, LogOut, ShieldCheck, Globe, Check } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { useTranslations } from "next-intl"
 
 interface AppSidebarProps {
@@ -30,9 +36,9 @@ function initials(name?: string | null) {
   return name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)
 }
 
-function LanguageSwitcher() {
+function useLocale() {
   const router = useRouter()
-  const t = useTranslations("language")
+  const current = typeof window !== "undefined" ? (localStorage.getItem("locale") ?? "en") : "en"
 
   function setLocale(code: string) {
     localStorage.setItem("locale", code)
@@ -40,11 +46,12 @@ function LanguageSwitcher() {
     router.refresh()
   }
 
-  const current = typeof window !== "undefined"
-    ? (localStorage.getItem("locale") ?? "en")
-    : "en"
+  return { current, setLocale }
+}
 
-  const currentFlag = LANGUAGES.find((l) => l.code === current)?.flag ?? "🇺🇸"
+function LanguageSwitcher() {
+  const t = useTranslations("language")
+  const { current, setLocale } = useLocale()
 
   return (
     <div className="space-y-1">
@@ -67,6 +74,37 @@ function LanguageSwitcher() {
         ))}
       </div>
     </div>
+  )
+}
+
+function MobileLanguageSwitcher() {
+  const t = useTranslations("language")
+  const { current, setLocale } = useLocale()
+  const currentFlag = LANGUAGES.find((l) => l.code === current)?.flag ?? "🇺🇸"
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger
+        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+        aria-label={t("label")}
+      >
+        <Globe className="h-4 w-4" />
+        <span>{currentFlag}</span>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="min-w-[130px]">
+        {LANGUAGES.map(({ code, flag }) => (
+          <DropdownMenuItem
+            key={code}
+            onClick={() => setLocale(code)}
+            className="flex items-center gap-2.5 cursor-pointer"
+          >
+            <span className="text-base">{flag}</span>
+            <span className="flex-1">{t(code as "en" | "tr" | "es")}</span>
+            {current === code && <Check className="h-3.5 w-3.5 text-[#E24B4A]" />}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }
 
@@ -156,6 +194,17 @@ export default function AppSidebar({ user }: AppSidebarProps) {
           </Button>
         </div>
       </aside>
+
+      {/* Mobile top header */}
+      <header className="md:hidden fixed top-0 inset-x-0 h-14 border-b bg-card z-30 flex items-center justify-between px-4">
+        <div className="flex items-center gap-2">
+          <div className="h-7 w-7 rounded-lg bg-[#E24B4A] flex items-center justify-center shrink-0">
+            <Camera className="h-3.5 w-3.5 text-white" />
+          </div>
+          <span className="text-base font-bold">EazyCal</span>
+        </div>
+        <MobileLanguageSwitcher />
+      </header>
 
       {/* Mobile bottom nav */}
       <nav className="md:hidden fixed bottom-0 inset-x-0 border-t bg-card z-30 flex">
