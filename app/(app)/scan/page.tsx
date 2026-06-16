@@ -42,6 +42,14 @@ const CONFIDENCE_COLORS = {
   low: "bg-red-500",
 }
 
+function defaultMealType(): "BREAKFAST" | "LUNCH" | "DINNER" | "SNACK" {
+  const h = new Date().getHours()
+  if (h < 10) return "BREAKFAST"
+  if (h < 14) return "LUNCH"
+  if (h < 18) return "SNACK"
+  return "DINNER"
+}
+
 async function resizeImage(file: File, maxDimension = 1024, quality = 0.8): Promise<File> {
   return new Promise((resolve, reject) => {
     const img = new window.Image()
@@ -95,7 +103,7 @@ export default function ScanPage() {
   const form = useForm<SaveValues>({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     resolver: zodResolver(saveSchema) as any,
-    defaultValues: { name: "", mealType: "SNACK", calories: 0, protein_g: 0, carbs_g: 0, fat_g: 0 },
+    defaultValues: { name: "", mealType: defaultMealType(), calories: 0, protein_g: 0, carbs_g: 0, fat_g: 0 },
   })
 
   function handleFile(f: File) {

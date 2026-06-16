@@ -6,7 +6,6 @@ import { toast } from "sonner"
 import { Camera, Trash2 } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
-import { Badge } from "@/components/ui/badge"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
@@ -45,6 +44,7 @@ export default function DashboardClient({ meals, totals, goal, date }: Props) {
   const [deleting, setDeleting] = useState<string | null>(null)
 
   const caloriePercent = Math.min(100, (totals.calories / goal.dailyCalories) * 100)
+  const caloriesOver = totals.calories - goal.dailyCalories
 
   async function deleteMeal(id: string) {
     setDeleting(id)
@@ -83,13 +83,15 @@ export default function DashboardClient({ meals, totals, goal, date }: Props) {
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="flex items-end gap-2">
-            <span className="text-4xl font-bold">{totals.calories}</span>
-            <span className="text-muted-foreground mb-1">/ {goal.dailyCalories} kcal</span>
+            <span className="text-5xl font-bold">{totals.calories}</span>
+            <span className="text-muted-foreground mb-1 text-base">/ {goal.dailyCalories} kcal</span>
           </div>
           <Progress value={caloriePercent} className="h-3" />
-          <p className="text-sm text-muted-foreground">
-            {Math.max(0, goal.dailyCalories - totals.calories)} kcal remaining
-          </p>
+          {caloriesOver > 0 ? (
+            <p className="text-sm font-medium text-red-500">Over by {caloriesOver} kcal</p>
+          ) : (
+            <p className="text-sm text-muted-foreground">{-caloriesOver} kcal remaining</p>
+          )}
         </CardContent>
       </Card>
 
@@ -98,22 +100,22 @@ export default function DashboardClient({ meals, totals, goal, date }: Props) {
         <CardHeader>
           <CardTitle>Macros</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
+        <CardContent className="space-y-4">
           {[
             { label: "Protein", value: totals.protein, goal: goal.proteinG, color: "bg-blue-500" },
-            { label: "Carbs", value: totals.carbs, goal: goal.carbsG, color: "bg-yellow-500" },
-            { label: "Fat", value: totals.fat, goal: goal.fatG, color: "bg-red-500" },
+            { label: "Carbs", value: totals.carbs, goal: goal.carbsG, color: "bg-amber-500" },
+            { label: "Fat", value: totals.fat, goal: goal.fatG, color: "bg-green-500" },
           ].map(({ label, value, goal: g, color }) => (
-            <div key={label} className="space-y-1">
+            <div key={label} className="space-y-1.5">
               <div className="flex justify-between text-sm">
-                <span>{label}</span>
+                <span className="font-medium">{label}</span>
                 <span className="text-muted-foreground">
                   {value.toFixed(1)}g{g ? ` / ${g}g` : ""}
                 </span>
               </div>
               <div className="h-2 bg-muted rounded-full overflow-hidden">
                 <div
-                  className={`h-full ${color} rounded-full transition-all`}
+                  className={`h-full ${color} rounded-full transition-all duration-500`}
                   style={{ width: g ? `${Math.min(100, (value / g) * 100)}%` : "0%" }}
                 />
               </div>
@@ -128,22 +130,23 @@ export default function DashboardClient({ meals, totals, goal, date }: Props) {
         if (typeMeals.length === 0) return null
         return (
           <div key={type}>
-            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+            <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-2 px-1">
               {type.charAt(0) + type.slice(1).toLowerCase()}
             </h2>
-            <div className="space-y-2">
-              {typeMeals.map((meal) => (
-                <Card key={meal.id} className="overflow-hidden">
-                  <CardContent className="p-4 flex items-center gap-3">
+            <Card>
+              <CardContent className="p-0 divide-y">
+                {typeMeals.map((meal) => (
+                  <div key={meal.id} className="flex items-center gap-3 p-4">
                     {meal.imageUrl && meal.imageUrl.includes("blob.vercel-storage.com") && (
-                      <div className="relative h-14 w-14 rounded-md overflow-hidden shrink-0">
+                      <div className="relative h-16 w-16 rounded-lg overflow-hidden shrink-0">
                         <Image src={meal.imageUrl} alt={meal.name} fill className="object-cover" />
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
                       <p className="font-medium truncate">{meal.name}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {meal.calories} kcal · P {meal.proteinG.toFixed(0)}g · C {meal.carbsG.toFixed(0)}g · F {meal.fatG.toFixed(0)}g
+                      <p className="text-sm font-semibold mt-0.5">{meal.calories} kcal</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        P {meal.proteinG.toFixed(0)}g · C {meal.carbsG.toFixed(0)}g · F {meal.fatG.toFixed(0)}g
                       </p>
                     </div>
                     <Button
@@ -155,10 +158,10 @@ export default function DashboardClient({ meals, totals, goal, date }: Props) {
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
           </div>
         )
       })}
