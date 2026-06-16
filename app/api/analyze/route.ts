@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { put } from "@vercel/blob"
 import { auth } from "@/lib/auth"
 import { analyzeImage } from "@/lib/gemini"
 
@@ -30,9 +31,12 @@ export async function POST(req: NextRequest) {
 
   const nutrition = await analyzeImage(base64, file.type)
 
-  // TODO: replace with real Vercel Blob upload once BLOB_READ_WRITE_TOKEN is set
+  const ext = file.name.split(".").pop() ?? "jpg"
+  const filename = `meals/${session.user.id}/${Date.now()}.${ext}`
+  const blob = await put(filename, buffer, { access: "public", contentType: file.type })
+
   return NextResponse.json({
     ...nutrition,
-    image_url: "/placeholder-meal.jpg",
+    image_url: blob.url,
   })
 }
