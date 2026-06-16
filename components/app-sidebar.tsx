@@ -1,12 +1,13 @@
 "use client"
 
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { signOut } from "next-auth/react"
-import { LayoutDashboard, Camera, History, Target, User, LogOut, ShieldCheck } from "lucide-react"
+import { LayoutDashboard, Camera, History, Target, User, LogOut, ShieldCheck, Globe } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
+import { useTranslations } from "next-intl"
 
 interface AppSidebarProps {
   user: {
@@ -18,21 +19,68 @@ interface AppSidebarProps {
   }
 }
 
-const nav = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/scan",      label: "Scan Meal",  icon: Camera },
-  { href: "/history",   label: "History",    icon: History },
-  { href: "/goals",     label: "Goals",      icon: Target },
-  { href: "/profile",   label: "Profile",    icon: User },
-]
+const LANGUAGES = [
+  { code: "en", flag: "🇺🇸" },
+  { code: "tr", flag: "🇹🇷" },
+  { code: "es", flag: "🇪🇸" },
+] as const
 
 function initials(name?: string | null) {
   if (!name) return "U"
   return name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)
 }
 
+function LanguageSwitcher() {
+  const router = useRouter()
+  const t = useTranslations("language")
+
+  function setLocale(code: string) {
+    localStorage.setItem("locale", code)
+    document.cookie = `locale=${code}; path=/; max-age=31536000; SameSite=Lax`
+    router.refresh()
+  }
+
+  const current = typeof window !== "undefined"
+    ? (localStorage.getItem("locale") ?? "en")
+    : "en"
+
+  const currentFlag = LANGUAGES.find((l) => l.code === current)?.flag ?? "🇺🇸"
+
+  return (
+    <div className="space-y-1">
+      <p className="text-xs text-muted-foreground px-3 mb-1">{t("label")}</p>
+      <div className="flex gap-1 px-1">
+        {LANGUAGES.map(({ code, flag }) => (
+          <button
+            key={code}
+            onClick={() => setLocale(code)}
+            title={t(code as "en" | "tr" | "es")}
+            className={cn(
+              "flex-1 py-1.5 rounded-lg text-sm font-medium transition-all",
+              current === code
+                ? "bg-[#E24B4A]/10 text-[#E24B4A] ring-1 ring-[#E24B4A]/30"
+                : "hover:bg-muted text-muted-foreground",
+            )}
+          >
+            {flag}
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 export default function AppSidebar({ user }: AppSidebarProps) {
   const pathname = usePathname()
+  const t = useTranslations("nav")
+
+  const nav = [
+    { href: "/dashboard", label: t("dashboard"),  icon: LayoutDashboard },
+    { href: "/scan",      label: t("scanMeal"),   icon: Camera },
+    { href: "/history",   label: t("history"),    icon: History },
+    { href: "/goals",     label: t("goals"),      icon: Target },
+    { href: "/profile",   label: t("profile"),    icon: User },
+  ]
 
   return (
     <>
@@ -78,13 +126,14 @@ export default function AppSidebar({ user }: AppSidebarProps) {
               )}
             >
               <ShieldCheck className="h-4 w-4 shrink-0" />
-              Admin
+              {t("admin")}
             </Link>
           )}
         </nav>
 
-        {/* User */}
-        <div className="p-4 border-t space-y-3">
+        {/* Language + User */}
+        <div className="p-4 border-t space-y-4">
+          <LanguageSwitcher />
           <div className="flex items-center gap-3">
             <Avatar className="h-9 w-9 border-2 border-[#E24B4A]/30">
               <AvatarImage src={user.image ?? ""} />
@@ -103,7 +152,7 @@ export default function AppSidebar({ user }: AppSidebarProps) {
             onClick={() => signOut({ callbackUrl: "/login" })}
           >
             <LogOut className="h-4 w-4 mr-2" />
-            Sign out
+            {t("signOut")}
           </Button>
         </div>
       </aside>

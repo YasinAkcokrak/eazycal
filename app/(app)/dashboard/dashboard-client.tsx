@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
 import Image from "next/image"
+import { useTranslations } from "next-intl"
 
 interface Meal {
   id: string
@@ -39,21 +40,18 @@ interface Props {
 
 const MEAL_ORDER = ["BREAKFAST", "LUNCH", "DINNER", "SNACK"]
 
-const MEAL_TYPE_CONFIG: Record<string, { label: string; badge: string }> = {
-  BREAKFAST: { label: "Breakfast", badge: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300" },
-  LUNCH:     { label: "Lunch",     badge: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300" },
-  DINNER:    { label: "Dinner",    badge: "bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300" },
-  SNACK:     { label: "Snack",     badge: "bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300" },
+const MEAL_EMOJI: Record<string, string> = {
+  BREAKFAST: "🌅", LUNCH: "☀️", DINNER: "🌙", SNACK: "🍎",
 }
 
-function getGreeting() {
-  const h = new Date().getHours()
-  if (h < 12) return "Good morning"
-  if (h < 17) return "Good afternoon"
-  return "Good evening"
+const MEAL_BADGE: Record<string, string> = {
+  BREAKFAST: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300",
+  LUNCH:     "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300",
+  DINNER:    "bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300",
+  SNACK:     "bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300",
 }
 
-function CalorieRing({ consumed, goal }: { consumed: number; goal: number }) {
+function CalorieRing({ consumed, goal, label }: { consumed: number; goal: number; label: string }) {
   const size = 192
   const sw = 18
   const r = (size - sw) / 2
@@ -77,27 +75,10 @@ function CalorieRing({ consumed, goal }: { consumed: number; goal: number }) {
       </svg>
       <div className="absolute text-center select-none">
         <p className="text-4xl font-bold leading-none">{consumed}</p>
-        <p className="text-xs text-muted-foreground mt-1">of {goal} kcal</p>
-        {over ? (
-          <p className="text-xs font-semibold text-red-500 mt-1">+{consumed - goal} over</p>
-        ) : (
-          <p className="text-xs text-muted-foreground mt-1">{goal - consumed} remaining</p>
-        )}
-      </div>
-    </div>
-  )
-}
-
-function MacroBar({ label, value, goal, color }: { label: string; value: number; goal: number | null; color: string }) {
-  const pct = goal ? Math.min(100, (value / goal) * 100) : 0
-  return (
-    <div className="space-y-1.5">
-      <div className="flex justify-between text-sm">
-        <span className="font-medium">{label}</span>
-        <span className="text-muted-foreground">{value.toFixed(1)}g{goal ? ` / ${goal}g` : ""}</span>
-      </div>
-      <div className="h-2 bg-muted rounded-full overflow-hidden">
-        <div className={cn("h-full rounded-full transition-all duration-500", color)} style={{ width: `${pct}%` }} />
+        <p className="text-xs text-muted-foreground mt-1">/ {goal} kcal</p>
+        <p className={cn("text-xs font-semibold mt-1", over ? "text-red-500" : "text-muted-foreground")}>
+          {label}
+        </p>
       </div>
     </div>
   )
@@ -106,13 +87,26 @@ function MacroBar({ label, value, goal, color }: { label: string; value: number;
 export default function DashboardClient({ meals, totals, goal, date, userName }: Props) {
   const router = useRouter()
   const [deleting, setDeleting] = useState<string | null>(null)
+  const t = useTranslations()
+
+  const caloriesOver = totals.calories - goal.dailyCalories
+  const ringLabel = caloriesOver > 0
+    ? t("dashboard.overBy", { amount: caloriesOver })
+    : `${goal.dailyCalories - totals.calories} ${t("dashboard.remaining")}`
+
+  function getGreeting() {
+    const h = new Date().getHours()
+    if (h < 12) return t("greeting.morning")
+    if (h < 17) return t("greeting.afternoon")
+    return t("greeting.evening")
+  }
 
   async function deleteMeal(id: string) {
     setDeleting(id)
     const res = await fetch(`/api/meals/${id}`, { method: "DELETE" })
     setDeleting(null)
-    if (res.ok) { toast.success("Meal removed"); router.refresh() }
-    else toast.error("Failed to delete meal")
+    if (res.ok) { toast.success(t("dashboard.mealRemoved")); router.refresh() }
+    else toast.error(t("dashboard.deleteFailed"))
   }
 
   const grouped = MEAL_ORDER.reduce<Record<string, Meal[]>>((acc, type) => {
@@ -122,8 +116,6 @@ export default function DashboardClient({ meals, totals, goal, date, userName }:
 
   return (
     <div className="space-y-6 pb-24 md:pb-8">
-
-      {/* Header */}
       <div>
         <p className="text-muted-foreground text-sm">{date}</p>
         <h1 className="text-2xl font-bold mt-0.5">
@@ -134,11 +126,24 @@ export default function DashboardClient({ meals, totals, goal, date, userName }:
       {/* Calorie ring + macros */}
       <Card>
         <CardContent className="pt-6 pb-5 space-y-6">
-          <CalorieRing consumed={totals.calories} goal={goal.dailyCalories} />
+          <CalorieRing consumed={totals.calories} goal={goal.dailyCalories} label={ringLabel} />
           <div className="space-y-3">
-            <MacroBar label="Protein" value={totals.protein} goal={goal.proteinG} color="bg-blue-500" />
-            <MacroBar label="Carbs"   value={totals.carbs}   goal={goal.carbsG}   color="bg-amber-500" />
-            <MacroBar label="Fat"     value={totals.fat}     goal={goal.fatG}     color="bg-green-500" />
+            {[
+              { key: "protein" as const, value: totals.protein, goal: goal.proteinG, color: "bg-blue-500" },
+              { key: "carbs"   as const, value: totals.carbs,   goal: goal.carbsG,   color: "bg-amber-500" },
+              { key: "fat"     as const, value: totals.fat,     goal: goal.fatG,     color: "bg-green-500" },
+            ].map(({ key, value, goal: g, color }) => (
+              <div key={key} className="space-y-1.5">
+                <div className="flex justify-between text-sm">
+                  <span className="font-medium">{t(`dashboard.${key}`)}</span>
+                  <span className="text-muted-foreground">{value.toFixed(1)}g{g ? ` / ${g}g` : ""}</span>
+                </div>
+                <div className="h-2 bg-muted rounded-full overflow-hidden">
+                  <div className={cn("h-full rounded-full transition-all duration-500", color)}
+                    style={{ width: g ? `${Math.min(100, (value / g) * 100)}%` : "0%" }} />
+                </div>
+              </div>
+            ))}
           </div>
         </CardContent>
       </Card>
@@ -147,12 +152,11 @@ export default function DashboardClient({ meals, totals, goal, date, userName }:
       {MEAL_ORDER.map((type) => {
         const typeMeals = grouped[type]
         if (typeMeals.length === 0) return null
-        const cfg = MEAL_TYPE_CONFIG[type]
         return (
           <div key={type}>
             <div className="flex items-center gap-2 mb-2 px-1">
-              <span className={cn("text-xs font-semibold px-2.5 py-0.5 rounded-full", cfg.badge)}>
-                {cfg.label}
+              <span className={cn("text-xs font-semibold px-2.5 py-0.5 rounded-full", MEAL_BADGE[type])}>
+                {t(`mealTypes.${type}`)}
               </span>
             </div>
             <Card>
@@ -165,7 +169,7 @@ export default function DashboardClient({ meals, totals, goal, date, userName }:
                       </div>
                     ) : (
                       <div className="h-16 w-16 rounded-xl bg-muted shrink-0 flex items-center justify-center text-2xl">
-                        {type === "BREAKFAST" ? "🌅" : type === "LUNCH" ? "☀️" : type === "DINNER" ? "🌙" : "🍎"}
+                        {MEAL_EMOJI[type]}
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
@@ -194,8 +198,8 @@ export default function DashboardClient({ meals, totals, goal, date, userName }:
       {meals.length === 0 && (
         <div className="text-center py-16 text-muted-foreground">
           <p className="text-4xl mb-3">🍽️</p>
-          <p className="font-medium mb-1">No meals logged today</p>
-          <p className="text-sm mb-6">Scan your first meal to get started</p>
+          <p className="font-medium mb-1">{t("dashboard.noMeals")}</p>
+          <p className="text-sm mb-6">{t("dashboard.scanFirst")}</p>
         </div>
       )}
 
@@ -209,7 +213,7 @@ export default function DashboardClient({ meals, totals, goal, date, userName }:
         )}
       >
         <Camera className="h-4 w-4" />
-        Scan Meal
+        {t("dashboard.scanMeal")}
       </Link>
     </div>
   )

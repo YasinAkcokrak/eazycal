@@ -1,0 +1,129 @@
+{
+  "nav": {
+    "dashboard": "Tablero",
+    "scanMeal": "Escanear Comida",
+    "history": "Historial",
+    "goals": "Objetivos",
+    "profile": "Perfil",
+    "signOut": "Cerrar sesión",
+    "admin": "Administración"
+  },
+  "common": {
+    "loading": "Cargando…",
+    "delete": "Eliminar",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "saving": "Guardando…",
+    "of": "de"
+  },
+  "greeting": {
+    "morning": "Buenos días",
+    "afternoon": "Buenas tardes",
+    "evening": "Buenas noches"
+  },
+  "dashboard": {
+    "title": "Tablero",
+    "remaining": "restantes",
+    "overBy": "Excedido por {amount} kcal",
+    "macros": "Macros",
+    "protein": "Proteína",
+    "carbs": "Carbohidratos",
+    "fat": "Grasas",
+    "noMeals": "No hay comidas registradas hoy",
+    "scanFirst": "Escanea tu primera comida para empezar",
+    "scanMeal": "Escanear Comida",
+    "caloriesToday": "Calorías",
+    "mealRemoved": "Comida eliminada",
+    "deleteFailed": "Error al eliminar la comida"
+  },
+  "mealTypes": {
+    "BREAKFAST": "Desayuno",
+    "LUNCH": "Almuerzo",
+    "DINNER": "Cena",
+    "SNACK": "Merienda"
+  },
+  "scan": {
+    "title": "Escanear Comida",
+    "subtitle": "Toma una foto y deja que la IA estime las calorías",
+    "takePhoto": "Tomar Foto",
+    "uploadPhoto": "Subir Foto",
+    "change": "Cambiar",
+    "analyze": "Analizar",
+    "analyzing": "Analizando…",
+    "mealName": "Nombre de la Comida",
+    "mealType": "Tipo de Comida",
+    "calories": "Calorías (kcal)",
+    "protein": "Proteína (g)",
+    "carbs": "Carbohidratos (g)",
+    "fat": "Grasas (g)",
+    "saveToToday": "Guardar para Hoy",
+    "saving": "Guardando…",
+    "highConfidence": "Alta confianza",
+    "mediumConfidence": "Confianza media",
+    "lowConfidence": "Baja confianza",
+    "analysisFailed": "Análisis fallido — intenta de nuevo",
+    "saveFailed": "Error al guardar la comida",
+    "saved": "¡Comida guardada!"
+  },
+  "history": {
+    "title": "Historial",
+    "subtitle": "Revisa tus comidas pasadas",
+    "today": "Hoy",
+    "yesterday": "Ayer",
+    "noMeals": "No hay comidas registradas en este día"
+  },
+  "goals": {
+    "title": "Objetivos Diarios",
+    "subtitle": "Establece tus objetivos de calorías y macros",
+    "calorieGoal": "Objetivo de Calorías",
+    "dailyCalories": "Calorías diarias (kcal)",
+    "macroTargets": "Objetivos de Macros",
+    "optional": "(opcional)",
+    "notSet": "No establecido",
+    "save": "Guardar Objetivos",
+    "saving": "Guardando…",
+    "saved": "¡Objetivos guardados!",
+    "saveFailed": "Error al guardar los objetivos"
+  },
+  "auth": {
+    "login": {
+      "title": "Bienvenido de nuevo",
+      "subtitle": "Inicia sesión para continuar en EazyCal",
+      "continueWithGoogle": "Continuar con Google",
+      "orSignInWith": "o inicia sesión con correo",
+      "email": "Correo electrónico",
+      "password": "Contraseña",
+      "signIn": "Iniciar sesión",
+      "signingIn": "Iniciando sesión…",
+      "noAccount": "¿No tienes cuenta?",
+      "createOne": "Créala",
+      "invalidCredentials": "Correo o contraseña inválidos"
+    },
+    "register": {
+      "title": "Crea tu cuenta",
+      "subtitle": "Empieza a rastrear calorías con IA hoy",
+      "fullName": "Nombre completo",
+      "email": "Correo electrónico",
+      "password": "Contraseña",
+      "passwordHint": "Mín. 8 caracteres",
+      "createAccount": "Crear cuenta",
+      "creatingAccount": "Creando cuenta…",
+      "alreadyHaveAccount": "¿Ya tienes cuenta?",
+      "signIn": "Inicia sesión",
+      "success": "¡Cuenta creada! Por favor inicia sesión.",
+      "failed": "Error en el registro"
+    },
+    "branding": {
+      "tagline": "Rastrea calorías con IA",
+      "feature1": "Fotografía tu comida para registrarla al instante",
+      "feature2": "La IA estima calorías y macros",
+      "feature3": "Sigue tu progreso hacia tus objetivos diarios"
+    }
+  },
+  "language": {
+    "label": "Idioma",
+    "en": "English",
+    "tr": "Türkçe",
+    "es": "Español"
+  }
+}

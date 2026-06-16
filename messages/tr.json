@@ -1,0 +1,129 @@
+{
+  "nav": {
+    "dashboard": "Gösterge Paneli",
+    "scanMeal": "Yemek Tara",
+    "history": "Geçmiş",
+    "goals": "Hedefler",
+    "profile": "Profil",
+    "signOut": "Çıkış Yap",
+    "admin": "Yönetim"
+  },
+  "common": {
+    "loading": "Yükleniyor…",
+    "delete": "Sil",
+    "cancel": "İptal",
+    "save": "Kaydet",
+    "saving": "Kaydediliyor…",
+    "of": "/"
+  },
+  "greeting": {
+    "morning": "Günaydın",
+    "afternoon": "İyi öğlenler",
+    "evening": "İyi akşamlar"
+  },
+  "dashboard": {
+    "title": "Gösterge Paneli",
+    "remaining": "kalan",
+    "overBy": "{amount} kcal fazla",
+    "macros": "Makrolar",
+    "protein": "Protein",
+    "carbs": "Karbonhidrat",
+    "fat": "Yağ",
+    "noMeals": "Bugün yemek kaydedilmedi",
+    "scanFirst": "Başlamak için ilk yemeğinizi tarayın",
+    "scanMeal": "Yemek Tara",
+    "caloriesToday": "Kalori",
+    "mealRemoved": "Yemek silindi",
+    "deleteFailed": "Yemek silinemedi"
+  },
+  "mealTypes": {
+    "BREAKFAST": "Kahvaltı",
+    "LUNCH": "Öğle Yemeği",
+    "DINNER": "Akşam Yemeği",
+    "SNACK": "Atıştırmalık"
+  },
+  "scan": {
+    "title": "Yemek Tara",
+    "subtitle": "Bir fotoğraf çekin, yapay zeka kalorileri tahmin etsin",
+    "takePhoto": "Fotoğraf Çek",
+    "uploadPhoto": "Fotoğraf Yükle",
+    "change": "Değiştir",
+    "analyze": "Analiz Et",
+    "analyzing": "Analiz ediliyor…",
+    "mealName": "Yemek Adı",
+    "mealType": "Öğün Türü",
+    "calories": "Kalori (kcal)",
+    "protein": "Protein (g)",
+    "carbs": "Karbonhidrat (g)",
+    "fat": "Yağ (g)",
+    "saveToToday": "Bugüne Kaydet",
+    "saving": "Kaydediliyor…",
+    "highConfidence": "Yüksek güven",
+    "mediumConfidence": "Orta güven",
+    "lowConfidence": "Düşük güven",
+    "analysisFailed": "Analiz başarısız — tekrar deneyin",
+    "saveFailed": "Yemek kaydedilemedi",
+    "saved": "Yemek kaydedildi!"
+  },
+  "history": {
+    "title": "Geçmiş",
+    "subtitle": "Geçmiş yemeklerinizi inceleyin",
+    "today": "Bugün",
+    "yesterday": "Dün",
+    "noMeals": "Bu günde yemek kaydedilmedi"
+  },
+  "goals": {
+    "title": "Günlük Hedefler",
+    "subtitle": "Kalori ve makro hedeflerinizi belirleyin",
+    "calorieGoal": "Kalori Hedefi",
+    "dailyCalories": "Günlük kalori (kcal)",
+    "macroTargets": "Makro Hedefleri",
+    "optional": "(isteğe bağlı)",
+    "notSet": "Belirlenmedi",
+    "save": "Hedefleri Kaydet",
+    "saving": "Kaydediliyor…",
+    "saved": "Hedefler kaydedildi!",
+    "saveFailed": "Hedefler kaydedilemedi"
+  },
+  "auth": {
+    "login": {
+      "title": "Tekrar hoş geldiniz",
+      "subtitle": "EazyCal'e devam etmek için giriş yapın",
+      "continueWithGoogle": "Google ile devam et",
+      "orSignInWith": "veya e-posta ile giriş yap",
+      "email": "E-posta",
+      "password": "Şifre",
+      "signIn": "Giriş Yap",
+      "signingIn": "Giriş yapılıyor…",
+      "noAccount": "Hesabınız yok mu?",
+      "createOne": "Oluşturun",
+      "invalidCredentials": "Geçersiz e-posta veya şifre"
+    },
+    "register": {
+      "title": "Hesap oluşturun",
+      "subtitle": "Yapay zeka ile kalori takibine bugün başlayın",
+      "fullName": "Ad Soyad",
+      "email": "E-posta",
+      "password": "Şifre",
+      "passwordHint": "En az 8 karakter",
+      "createAccount": "Hesap Oluştur",
+      "creatingAccount": "Hesap oluşturuluyor…",
+      "alreadyHaveAccount": "Zaten hesabınız var mı?",
+      "signIn": "Giriş Yap",
+      "success": "Hesap oluşturuldu! Lütfen giriş yapın.",
+      "failed": "Kayıt başarısız"
+    },
+    "branding": {
+      "tagline": "Yapay zeka ile kalori takibi",
+      "feature1": "Yemeğinizi anında kaydetmek için fotoğraf çekin",
+      "feature2": "Yapay zeka kalori ve makroları tahmin eder",
+      "feature3": "Günlük hedeflerinize doğru ilerlemenizi takip edin"
+    }
+  },
+  "language": {
+    "label": "Dil",
+    "en": "English",
+    "tr": "Türkçe",
+    "es": "Español"
+  }
+}

@@ -1,0 +1,129 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "scanMeal": "Scan Meal",
+    "history": "History",
+    "goals": "Goals",
+    "profile": "Profile",
+    "signOut": "Sign out",
+    "admin": "Admin"
+  },
+  "common": {
+    "loading": "Loading…",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving…",
+    "of": "of"
+  },
+  "greeting": {
+    "morning": "Good morning",
+    "afternoon": "Good afternoon",
+    "evening": "Good evening"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "remaining": "remaining",
+    "overBy": "Over by {amount} kcal",
+    "macros": "Macros",
+    "protein": "Protein",
+    "carbs": "Carbs",
+    "fat": "Fat",
+    "noMeals": "No meals logged today",
+    "scanFirst": "Scan your first meal to get started",
+    "scanMeal": "Scan Meal",
+    "caloriesToday": "Calories",
+    "mealRemoved": "Meal removed",
+    "deleteFailed": "Failed to delete meal"
+  },
+  "mealTypes": {
+    "BREAKFAST": "Breakfast",
+    "LUNCH": "Lunch",
+    "DINNER": "Dinner",
+    "SNACK": "Snack"
+  },
+  "scan": {
+    "title": "Scan a Meal",
+    "subtitle": "Take a photo and let AI estimate the calories",
+    "takePhoto": "Take Photo",
+    "uploadPhoto": "Upload Photo",
+    "change": "Change",
+    "analyze": "Analyze",
+    "analyzing": "Analyzing…",
+    "mealName": "Meal Name",
+    "mealType": "Meal Type",
+    "calories": "Calories (kcal)",
+    "protein": "Protein (g)",
+    "carbs": "Carbs (g)",
+    "fat": "Fat (g)",
+    "saveToToday": "Save to Today",
+    "saving": "Saving…",
+    "highConfidence": "High confidence",
+    "mediumConfidence": "Medium confidence",
+    "lowConfidence": "Low confidence",
+    "analysisFailed": "Analysis failed — try again",
+    "saveFailed": "Failed to save meal",
+    "saved": "Meal saved!"
+  },
+  "history": {
+    "title": "History",
+    "subtitle": "Review your past meals",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "noMeals": "No meals logged on this day"
+  },
+  "goals": {
+    "title": "Daily Goals",
+    "subtitle": "Set your calorie and macro targets",
+    "calorieGoal": "Calorie Goal",
+    "dailyCalories": "Daily calories (kcal)",
+    "macroTargets": "Macro Targets",
+    "optional": "(optional)",
+    "notSet": "Not set",
+    "save": "Save Goals",
+    "saving": "Saving…",
+    "saved": "Goals saved!",
+    "saveFailed": "Failed to save goals"
+  },
+  "auth": {
+    "login": {
+      "title": "Welcome back",
+      "subtitle": "Sign in to continue to EazyCal",
+      "continueWithGoogle": "Continue with Google",
+      "orSignInWith": "or sign in with email",
+      "email": "Email",
+      "password": "Password",
+      "signIn": "Sign in",
+      "signingIn": "Signing in…",
+      "noAccount": "Don't have an account?",
+      "createOne": "Create one",
+      "invalidCredentials": "Invalid email or password"
+    },
+    "register": {
+      "title": "Create your account",
+      "subtitle": "Start tracking calories with AI today",
+      "fullName": "Full name",
+      "email": "Email",
+      "password": "Password",
+      "passwordHint": "Min. 8 characters",
+      "createAccount": "Create account",
+      "creatingAccount": "Creating account…",
+      "alreadyHaveAccount": "Already have an account?",
+      "signIn": "Sign in",
+      "success": "Account created! Please sign in.",
+      "failed": "Registration failed"
+    },
+    "branding": {
+      "tagline": "Track calories with AI",
+      "feature1": "Photograph your meal to log it instantly",
+      "feature2": "AI estimates calories and macros",
+      "feature3": "Track progress toward your daily goals"
+    }
+  },
+  "language": {
+    "label": "Language",
+    "en": "English",
+    "tr": "Türkçe",
+    "es": "Español"
+  }
+}

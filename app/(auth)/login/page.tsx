@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Loader2 } from "lucide-react"
 import Link from "next/link"
+import { useTranslations } from "next-intl"
 
 const schema = z.object({
   email: z.string().email("Invalid email"),
@@ -34,6 +35,7 @@ const inputClass = "focus-visible:ring-[#E24B4A] focus-visible:border-[#E24B4A]"
 
 export default function LoginPage() {
   const router = useRouter()
+  const t = useTranslations("auth.login")
   const [loading, setLoading] = useState(false)
   const [googleLoading, setGoogleLoading] = useState(false)
 
@@ -46,7 +48,7 @@ export default function LoginPage() {
     setLoading(true)
     const res = await signIn("credentials", { email: values.email, password: values.password, redirect: false })
     setLoading(false)
-    if (res?.error) toast.error("Invalid email or password")
+    if (res?.error) toast.error(t("invalidCredentials"))
     else router.push("/dashboard")
   }
 
@@ -58,11 +60,10 @@ export default function LoginPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold">Welcome back</h2>
-        <p className="text-muted-foreground text-sm mt-1">Sign in to continue to EazyCal</p>
+        <h2 className="text-2xl font-bold">{t("title")}</h2>
+        <p className="text-muted-foreground text-sm mt-1">{t("subtitle")}</p>
       </div>
 
-      {/* Google */}
       <Button
         variant="outline"
         className="w-full h-11 font-medium gap-2.5 border-border hover:bg-muted"
@@ -70,12 +71,12 @@ export default function LoginPage() {
         disabled={googleLoading}
       >
         {googleLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <GoogleIcon />}
-        Continue with Google
+        {t("continueWithGoogle")}
       </Button>
 
       <div className="flex items-center gap-3">
         <div className="flex-1 h-px bg-border" />
-        <span className="text-xs text-muted-foreground">or sign in with email</span>
+        <span className="text-xs text-muted-foreground">{t("orSignInWith")}</span>
         <div className="flex-1 h-px bg-border" />
       </div>
 
@@ -86,7 +87,7 @@ export default function LoginPage() {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel>{t("email")}</FormLabel>
                 <FormControl>
                   <Input type="email" placeholder="you@example.com" className={inputClass} {...field} />
                 </FormControl>
@@ -99,7 +100,7 @@ export default function LoginPage() {
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Password</FormLabel>
+                <FormLabel>{t("password")}</FormLabel>
                 <FormControl>
                   <Input type="password" placeholder="••••••••" className={inputClass} {...field} />
                 </FormControl>
@@ -112,15 +113,15 @@ export default function LoginPage() {
             className="w-full h-11 bg-[#E24B4A] hover:bg-[#c93d3c] text-white font-semibold text-base"
             disabled={loading}
           >
-            {loading ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Signing in…</> : "Sign in"}
+            {loading ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />{t("signingIn")}</> : t("signIn")}
           </Button>
         </form>
       </Form>
 
       <p className="text-center text-sm text-muted-foreground">
-        Don&apos;t have an account?{" "}
+        {t("noAccount")}{" "}
         <Link href="/register" className="text-[#E24B4A] font-semibold hover:underline">
-          Create one
+          {t("createOne")}
         </Link>
       </p>
     </div>

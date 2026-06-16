@@ -2,6 +2,8 @@ import type { Metadata } from "next"
 import { Geist } from "next/font/google"
 import "./globals.css"
 import { Toaster } from "@/components/ui/sonner"
+import { NextIntlClientProvider } from "next-intl"
+import { getLocale, getMessages } from "next-intl/server"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -19,19 +21,22 @@ export const metadata: Metadata = {
   },
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
+  const locale = await getLocale()
+  const messages = await getMessages()
+
   return (
-    <html lang="en" className={`${geistSans.variable} h-full antialiased`}>
+    <html lang={locale} className={`${geistSans.variable} h-full antialiased`}>
       <head>
         <meta name="theme-color" content="#E24B4A" />
       </head>
       <body className="min-h-full flex flex-col bg-background text-foreground">
-        {children}
-        <Toaster position="bottom-right" richColors />
+        <NextIntlClientProvider locale={locale} messages={messages}>
+          {children}
+          <Toaster position="bottom-right" richColors />
+        </NextIntlClientProvider>
       </body>
     </html>
   )

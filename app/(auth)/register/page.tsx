@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Loader2 } from "lucide-react"
 import Link from "next/link"
+import { useTranslations } from "next-intl"
 
 const schema = z.object({
   name: z.string().min(1, "Name is required").max(100),
@@ -23,6 +24,7 @@ const inputClass = "focus-visible:ring-[#E24B4A] focus-visible:border-[#E24B4A]"
 
 export default function RegisterPage() {
   const router = useRouter()
+  const t = useTranslations("auth.register")
   const [loading, setLoading] = useState(false)
 
   const form = useForm<FormValues>({
@@ -41,19 +43,19 @@ export default function RegisterPage() {
 
     if (!res.ok) {
       const { error } = await res.json()
-      toast.error(error ?? "Registration failed")
+      toast.error(error ?? t("failed"))
       return
     }
 
-    toast.success("Account created! Please sign in.")
+    toast.success(t("success"))
     router.push("/login")
   }
 
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold">Create your account</h2>
-        <p className="text-muted-foreground text-sm mt-1">Start tracking calories with AI today</p>
+        <h2 className="text-2xl font-bold">{t("title")}</h2>
+        <p className="text-muted-foreground text-sm mt-1">{t("subtitle")}</p>
       </div>
 
       <Form {...form}>
@@ -63,7 +65,7 @@ export default function RegisterPage() {
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Full name</FormLabel>
+                <FormLabel>{t("fullName")}</FormLabel>
                 <FormControl>
                   <Input placeholder="Your name" className={inputClass} {...field} />
                 </FormControl>
@@ -76,7 +78,7 @@ export default function RegisterPage() {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel>{t("email")}</FormLabel>
                 <FormControl>
                   <Input type="email" placeholder="you@example.com" className={inputClass} {...field} />
                 </FormControl>
@@ -89,9 +91,9 @@ export default function RegisterPage() {
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Password</FormLabel>
+                <FormLabel>{t("password")}</FormLabel>
                 <FormControl>
-                  <Input type="password" placeholder="Min. 8 characters" className={inputClass} {...field} />
+                  <Input type="password" placeholder={t("passwordHint")} className={inputClass} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -102,15 +104,15 @@ export default function RegisterPage() {
             className="w-full h-11 bg-[#E24B4A] hover:bg-[#c93d3c] text-white font-semibold text-base"
             disabled={loading}
           >
-            {loading ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Creating account…</> : "Create account"}
+            {loading ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />{t("creatingAccount")}</> : t("createAccount")}
           </Button>
         </form>
       </Form>
 
       <p className="text-center text-sm text-muted-foreground">
-        Already have an account?{" "}
+        {t("alreadyHaveAccount")}{" "}
         <Link href="/login" className="text-[#E24B4A] font-semibold hover:underline">
-          Sign in
+          {t("signIn")}
         </Link>
       </p>
     </div>

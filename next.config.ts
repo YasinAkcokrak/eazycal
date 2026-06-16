@@ -1,4 +1,5 @@
 import type { NextConfig } from "next"
+import createNextIntlPlugin from "next-intl/plugin"
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const withPWA = require("next-pwa")({
@@ -7,6 +8,8 @@ const withPWA = require("next-pwa")({
   register: true,
   skipWaiting: true,
 })
+
+const withNextIntl = createNextIntlPlugin("./i18n/request.ts")
 
 const nextConfig: NextConfig = {
   turbopack: {},
@@ -22,4 +25,4 @@ const nextConfig: NextConfig = {
   },
 }
 
-export default withPWA(nextConfig)
+export default withNextIntl(withPWA(nextConfig))
