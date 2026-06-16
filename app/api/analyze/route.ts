@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { put } from "@vercel/blob"
+import sharp from "sharp"
 import { auth } from "@/lib/auth"
 import { analyzeImage } from "@/lib/gemini"
 
@@ -26,14 +27,19 @@ export async function POST(req: NextRequest) {
   }
 
   const arrayBuffer = await file.arrayBuffer()
-  const buffer = Buffer.from(arrayBuffer)
+  const raw = Buffer.from(arrayBuffer)
+
+  const buffer = await sharp(raw)
+    .resize(1024, 1024, { fit: "inside", withoutEnlargement: true })
+    .jpeg({ quality: 80 })
+    .toBuffer()
+
   const base64 = buffer.toString("base64")
 
-  const nutrition = await analyzeImage(base64, file.type)
+  const nutrition = await analyzeImage(base64, "image/jpeg")
 
-  const ext = file.name.split(".").pop() ?? "jpg"
-  const filename = `meals/${session.user.id}/${Date.now()}.${ext}`
-  const blob = await put(filename, buffer, { access: "public", contentType: file.type })
+  const filename = `meals/${session.user.id}/${Date.now()}.jpg`
+  const blob = await put(filename, buffer, { access: "public", contentType: "image/jpeg" })
 
   return NextResponse.json({
     ...nutrition,
