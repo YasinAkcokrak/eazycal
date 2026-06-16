@@ -32,6 +32,7 @@ export default async function DashboardPage() {
 
   return (
     <DashboardClient
+      userName={session!.user.name ?? null}
       meals={meals.map((m: Meal) => ({
         id: m.id,
         name: m.name,
