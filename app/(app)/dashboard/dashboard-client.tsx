@@ -135,7 +135,7 @@ export default function DashboardClient({ meals, totals, goal, date }: Props) {
               {typeMeals.map((meal) => (
                 <Card key={meal.id} className="overflow-hidden">
                   <CardContent className="p-4 flex items-center gap-3">
-                    {meal.imageUrl && (
+                    {meal.imageUrl && meal.imageUrl.includes("blob.vercel-storage.com") && (
                       <div className="relative h-14 w-14 rounded-md overflow-hidden shrink-0">
                         <Image
                           src={`/api/images?url=${encodeURIComponent(meal.imageUrl)}`}
