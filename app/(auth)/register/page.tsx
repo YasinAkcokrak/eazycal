@@ -6,10 +6,10 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { toast } from "sonner"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { Loader2 } from "lucide-react"
 import Link from "next/link"
 
 const schema = z.object({
@@ -18,6 +18,8 @@ const schema = z.object({
   password: z.string().min(8, "Password must be at least 8 characters"),
 })
 type FormValues = z.infer<typeof schema>
+
+const inputClass = "focus-visible:ring-[#E24B4A] focus-visible:border-[#E24B4A]"
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -48,68 +50,69 @@ export default function RegisterPage() {
   }
 
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader className="text-center space-y-1">
-        <div className="text-3xl font-bold text-primary mb-1">CalorieLens</div>
-        <CardTitle className="text-xl">Create an account</CardTitle>
-        <CardDescription>Start tracking your calories today</CardDescription>
-      </CardHeader>
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-2xl font-bold">Create your account</h2>
+        <p className="text-muted-foreground text-sm mt-1">Start tracking calories with AI today</p>
+      </div>
 
-      <CardContent>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Your name" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input type="email" placeholder="you@example.com" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <Input type="password" placeholder="Min. 8 characters" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Creating account..." : "Create account"}
-            </Button>
-          </form>
-        </Form>
-      </CardContent>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Full name</FormLabel>
+                <FormControl>
+                  <Input placeholder="Your name" className={inputClass} {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input type="email" placeholder="you@example.com" className={inputClass} {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Password</FormLabel>
+                <FormControl>
+                  <Input type="password" placeholder="Min. 8 characters" className={inputClass} {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button
+            type="submit"
+            className="w-full h-11 bg-[#E24B4A] hover:bg-[#c93d3c] text-white font-semibold text-base"
+            disabled={loading}
+          >
+            {loading ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Creating account…</> : "Create account"}
+          </Button>
+        </form>
+      </Form>
 
-      <CardFooter className="justify-center text-sm text-muted-foreground">
+      <p className="text-center text-sm text-muted-foreground">
         Already have an account?{" "}
-        <Link href="/login" className="text-primary font-medium ml-1 hover:underline">
+        <Link href="/login" className="text-[#E24B4A] font-semibold hover:underline">
           Sign in
         </Link>
-      </CardFooter>
-    </Card>
+      </p>
+    </div>
   )
 }
