@@ -36,10 +36,10 @@ export async function POST(req: NextRequest) {
 
   const ext = file.name.split(".").pop() ?? "jpg"
   const pathname = `meals/${session.user.id}/${Date.now()}.${ext}`
-  await put(pathname, buffer, { access: "private", contentType: file.type })
+  const blob = await put(pathname, buffer, { access: "public", contentType: file.type })
 
   return NextResponse.json({
     ...nutrition,
-    image_url: pathname,
+    image_url: blob.url,
   })
 }
