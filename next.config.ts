@@ -11,6 +11,9 @@ const withPWA = require("next-pwa")({
 const nextConfig: NextConfig = {
   turbopack: {},
   images: {
+    localPatterns: [
+      { pathname: "/api/images", search: "*" },
+    ],
     remotePatterns: [
       { protocol: "https", hostname: "**.vercel-storage.com" },
       { protocol: "https", hostname: "lh3.googleusercontent.com" },
