@@ -42,6 +42,46 @@ const CONFIDENCE_COLORS = {
   low: "bg-red-500",
 }
 
+async function resizeImage(file: File, maxDimension = 1024, quality = 0.8): Promise<File> {
+  return new Promise((resolve, reject) => {
+    const img = new window.Image()
+    const objectUrl = URL.createObjectURL(file)
+
+    img.onload = () => {
+      URL.revokeObjectURL(objectUrl)
+
+      let { width, height } = img
+      if (width > maxDimension || height > maxDimension) {
+        if (width >= height) {
+          height = Math.round((height / width) * maxDimension)
+          width = maxDimension
+        } else {
+          width = Math.round((width / height) * maxDimension)
+          height = maxDimension
+        }
+      }
+
+      const canvas = document.createElement("canvas")
+      canvas.width = width
+      canvas.height = height
+      canvas.getContext("2d")!.drawImage(img, 0, 0, width, height)
+
+      canvas.toBlob(
+        (blob) => {
+          if (!blob) { reject(new Error("Canvas resize failed")); return }
+          const name = file.name.replace(/\.[^.]+$/, ".jpg")
+          resolve(new File([blob], name, { type: "image/jpeg" }))
+        },
+        "image/jpeg",
+        quality,
+      )
+    }
+
+    img.onerror = () => { URL.revokeObjectURL(objectUrl); reject(new Error("Failed to load image")) }
+    img.src = objectUrl
+  })
+}
+
 export default function ScanPage() {
   const router = useRouter()
   const [preview, setPreview] = useState<string | null>(null)
@@ -68,8 +108,9 @@ export default function ScanPage() {
   async function analyze() {
     if (!file) return
     setAnalyzing(true)
+    const resized = await resizeImage(file)
     const fd = new FormData()
-    fd.append("image", file)
+    fd.append("image", resized)
 
     const res = await fetch("/api/analyze", { method: "POST", body: fd })
     setAnalyzing(false)

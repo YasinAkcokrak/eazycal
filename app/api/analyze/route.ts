@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from "next/server"
 import { put } from "@vercel/blob"
-import sharp from "sharp"
 import { auth } from "@/lib/auth"
 import { analyzeImage } from "@/lib/gemini"
 
-const MAX_SIZE = 10 * 1024 * 1024 // 10 MB
+const MAX_SIZE = 4 * 1024 * 1024 // 4 MB — client resizes before upload
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"]
 
 export async function POST(req: NextRequest) {
@@ -23,23 +22,21 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid file type" }, { status: 400 })
   }
   if (file.size > MAX_SIZE) {
-    return NextResponse.json({ error: "File too large (max 10MB)" }, { status: 400 })
+    return NextResponse.json(
+      { error: "File too large (max 4MB). Please use a smaller photo." },
+      { status: 400 },
+    )
   }
 
   const arrayBuffer = await file.arrayBuffer()
-  const raw = Buffer.from(arrayBuffer)
-
-  const buffer = await sharp(raw)
-    .resize(1024, 1024, { fit: "inside", withoutEnlargement: true })
-    .jpeg({ quality: 80 })
-    .toBuffer()
-
+  const buffer = Buffer.from(arrayBuffer)
   const base64 = buffer.toString("base64")
 
-  const nutrition = await analyzeImage(base64, "image/jpeg")
+  const nutrition = await analyzeImage(base64, file.type)
 
-  const filename = `meals/${session.user.id}/${Date.now()}.jpg`
-  const blob = await put(filename, buffer, { access: "public", contentType: "image/jpeg" })
+  const ext = file.name.split(".").pop() ?? "jpg"
+  const filename = `meals/${session.user.id}/${Date.now()}.${ext}`
+  const blob = await put(filename, buffer, { access: "public", contentType: file.type })
 
   return NextResponse.json({
     ...nutrition,
