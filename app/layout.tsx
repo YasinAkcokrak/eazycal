@@ -9,8 +9,14 @@ const geistSans = Geist({
 })
 
 export const metadata: Metadata = {
-  title: "CalorieLens — AI Calorie Tracker",
+  title: "EazyCal — AI Calorie Tracker",
   description: "Photograph your meals and track calories with AI",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "EazyCal",
+  },
 }
 
 export default function RootLayout({
@@ -20,6 +26,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${geistSans.variable} h-full antialiased`}>
+      <head>
+        <meta name="theme-color" content="#E24B4A" />
+      </head>
       <body className="min-h-full flex flex-col bg-background text-foreground">
         {children}
         <Toaster position="bottom-right" richColors />
