@@ -14,6 +14,8 @@ export async function POST(req: NextRequest) {
 
   const formData = await req.formData()
   const file = formData.get("image") as File | null
+  const rawLocale = (formData.get("locale") as string | null) ?? "en"
+  const locale = ["en", "tr", "es"].includes(rawLocale) ? rawLocale : "en"
 
   if (!file) {
     return NextResponse.json({ error: "No image provided" }, { status: 400 })
@@ -32,7 +34,7 @@ export async function POST(req: NextRequest) {
   const buffer = Buffer.from(arrayBuffer)
   const base64 = buffer.toString("base64")
 
-  const nutrition = await analyzeImage(base64, file.type)
+  const nutrition = await analyzeImage(base64, file.type, locale)
 
   const ext = file.name.split(".").pop() ?? "jpg"
   const pathname = `meals/${session.user.id}/${Date.now()}.${ext}`

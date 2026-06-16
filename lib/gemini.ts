@@ -12,7 +12,11 @@ export interface NutritionResult {
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! })
 
-const PROMPT = `Analyze this meal image and return ONLY a JSON object with no markdown, no code fences, and no extra text.
+const LANG_LABELS: Record<string, string> = { en: "English", tr: "Turkish", es: "Spanish" }
+
+function buildPrompt(locale: string): string {
+  const lang = LANG_LABELS[locale] ?? "English"
+  return `Analyze this meal image and return ONLY a JSON object with no markdown, no code fences, and no extra text.
 
 Required format:
 {
@@ -28,12 +32,15 @@ Required format:
 Rules:
 - calories, protein_g, carbs_g, fat_g must be numbers (no strings)
 - confidence is "high" if ingredients are clearly visible, "medium" if partially visible, "low" if unclear
+- Write meal_name and notes in ${lang}
 - notes should mention estimation assumptions or missing details
 - Return ONLY the JSON object, nothing else`
+}
 
 export async function analyzeImage(
   imageBase64: string,
   mimeType: string,
+  locale = "en",
 ): Promise<NutritionResult> {
   const response = await anthropic.messages.create({
     model: "claude-sonnet-4-6",
@@ -50,7 +57,7 @@ export async function analyzeImage(
               data: imageBase64,
             },
           },
-          { type: "text", text: PROMPT },
+          { type: "text", text: buildPrompt(locale) },
         ],
       },
     ],

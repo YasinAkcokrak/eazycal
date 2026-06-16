@@ -63,7 +63,10 @@
     "lowConfidence": "Düşük güven",
     "analysisFailed": "Analiz başarısız — tekrar deneyin",
     "saveFailed": "Yemek kaydedilemedi",
-    "saved": "Yemek kaydedildi!"
+    "saved": "Yemek kaydedildi!",
+    "analyzingFeedback": "Öğününüz analiz ediliyor…",
+    "tryInstead": "Bunun yerine deneyin",
+    "goToDashboard": "Panele Git"
   },
   "history": {
     "title": "Geçmiş",

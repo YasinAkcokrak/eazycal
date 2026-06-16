@@ -6,14 +6,14 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { toast } from "sonner"
-import { Camera, Upload, Loader2, Sparkles } from "lucide-react"
+import { Camera, Upload, Loader2, Sparkles, AlertTriangle, ChefHat, ArrowRight, CheckCircle2 } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import Image from "next/image"
 import { cn } from "@/lib/utils"
-import { useTranslations } from "next-intl"
+import { useTranslations, useLocale } from "next-intl"
 
 interface NutritionResult {
   meal_name: string
@@ -24,6 +24,12 @@ interface NutritionResult {
   confidence: "high" | "medium" | "low"
   notes: string
   image_url: string
+}
+
+interface FeedbackResult {
+  warning: string | null
+  suggestion: string | null
+  alternativeMeal: string | null
 }
 
 const saveSchema = z.object({
@@ -77,11 +83,16 @@ async function resizeImage(file: File, maxDimension = 1024, quality = 0.8): Prom
 export default function ScanPage() {
   const router = useRouter()
   const t = useTranslations()
+  const locale = useLocale()
+
   const [preview, setPreview] = useState<string | null>(null)
   const [file, setFile] = useState<File | null>(null)
   const [analyzing, setAnalyzing] = useState(false)
   const [saving, setSaving] = useState(false)
   const [result, setResult] = useState<NutritionResult | null>(null)
+  const [mealSaved, setMealSaved] = useState(false)
+  const [feedback, setFeedback] = useState<FeedbackResult | null>(null)
+  const [feedbackLoading, setFeedbackLoading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const cameraInputRef = useRef<HTMLInputElement>(null)
 
@@ -92,16 +103,22 @@ export default function ScanPage() {
   })
 
   function handleFile(f: File) {
-    setFile(f); setResult(null)
+    setFile(f)
+    setResult(null)
+    setMealSaved(false)
+    setFeedback(null)
     setPreview(URL.createObjectURL(f))
   }
 
   async function analyze() {
     if (!file) return
     setAnalyzing(true)
+    setMealSaved(false)
+    setFeedback(null)
     const resized = await resizeImage(file)
     const fd = new FormData()
     fd.append("image", resized)
+    fd.append("locale", locale)
     const res = await fetch("/api/analyze", { method: "POST", body: fd })
     setAnalyzing(false)
     if (!res.ok) { toast.error(t("scan.analysisFailed")); return }
@@ -115,12 +132,42 @@ export default function ScanPage() {
     const res = await fetch("/api/meals", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...values, image_url: result?.image_url, confidence: result?.confidence?.toUpperCase(), ai_notes: result?.notes }),
+      body: JSON.stringify({
+        ...values,
+        image_url: result?.image_url,
+        confidence: result?.confidence?.toUpperCase(),
+        ai_notes: result?.notes,
+      }),
     })
-    setSaving(false)
-    if (!res.ok) { toast.error(t("scan.saveFailed")); return }
+    if (!res.ok) {
+      setSaving(false)
+      toast.error(t("scan.saveFailed"))
+      return
+    }
     toast.success(t("scan.saved"))
-    router.push("/dashboard")
+    setMealSaved(true)
+    setSaving(false)
+
+    // Fetch personalised feedback in the background
+    setFeedbackLoading(true)
+    try {
+      const fbRes = await fetch("/api/meals/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          mealName: values.name,
+          calories: values.calories,
+          proteinG: values.protein_g,
+          fatG: values.fat_g,
+          carbsG: values.carbs_g,
+          locale,
+        }),
+      })
+      if (fbRes.ok) setFeedback(await fbRes.json())
+    } catch {
+      // feedback is non-critical — fail silently
+    }
+    setFeedbackLoading(false)
   }
 
   const confidenceLabel: Record<string, string> = {
@@ -240,9 +287,70 @@ export default function ScanPage() {
                   ))}
                 </div>
 
-                <Button type="submit" className="w-full bg-[#E24B4A] hover:bg-[#c93d3c] text-white h-12 text-base font-semibold" disabled={saving}>
-                  {saving ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />{t("scan.saving")}</> : t("scan.saveToToday")}
+                {/* Save button — turns green after save */}
+                <Button
+                  type="submit"
+                  className={cn(
+                    "w-full h-12 text-base font-semibold gap-2",
+                    mealSaved
+                      ? "bg-green-500 hover:bg-green-500 text-white"
+                      : "bg-[#E24B4A] hover:bg-[#c93d3c] text-white",
+                  )}
+                  disabled={saving || mealSaved}
+                >
+                  {saving ? (
+                    <><Loader2 className="h-4 w-4 animate-spin" />{t("scan.saving")}</>
+                  ) : mealSaved ? (
+                    <><CheckCircle2 className="h-4 w-4" />{t("scan.saved")}</>
+                  ) : (
+                    t("scan.saveToToday")
+                  )}
                 </Button>
+
+                {/* Feedback section — shown after save */}
+                {mealSaved && (
+                  <div className="space-y-3 pt-1">
+                    {feedbackLoading && (
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground py-1">
+                        <Loader2 className="h-4 w-4 animate-spin shrink-0" />
+                        {t("scan.analyzingFeedback")}
+                      </div>
+                    )}
+
+                    {feedback?.warning && (
+                      <div className="flex items-start gap-3 p-3 rounded-xl bg-orange-50 dark:bg-orange-950/20 border border-orange-200 dark:border-orange-800">
+                        <AlertTriangle className="h-4 w-4 text-orange-600 dark:text-orange-400 mt-0.5 shrink-0" />
+                        <p className="text-sm text-orange-800 dark:text-orange-200">{feedback.warning}</p>
+                      </div>
+                    )}
+
+                    {feedback?.suggestion && (
+                      <div className="flex items-start gap-3 p-3 rounded-xl bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800">
+                        <Sparkles className="h-4 w-4 text-green-600 dark:text-green-400 mt-0.5 shrink-0" />
+                        <p className="text-sm text-green-800 dark:text-green-200">{feedback.suggestion}</p>
+                      </div>
+                    )}
+
+                    {feedback?.alternativeMeal && (
+                      <div className="flex items-start gap-3 p-3 rounded-xl bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800">
+                        <ChefHat className="h-4 w-4 text-blue-600 dark:text-blue-400 mt-0.5 shrink-0" />
+                        <p className="text-sm text-blue-800 dark:text-blue-200">
+                          {t("scan.tryInstead")}:{" "}
+                          <strong>{feedback.alternativeMeal}</strong>
+                        </p>
+                      </div>
+                    )}
+
+                    <Button
+                      type="button"
+                      className="w-full h-11 gap-2 bg-[#E24B4A] hover:bg-[#c93d3c] text-white font-semibold"
+                      onClick={() => router.push("/dashboard")}
+                    >
+                      {t("scan.goToDashboard")}
+                      <ArrowRight className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
               </form>
             </Form>
           </CardContent>

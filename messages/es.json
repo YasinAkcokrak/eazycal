@@ -63,7 +63,10 @@
     "lowConfidence": "Baja confianza",
     "analysisFailed": "Análisis fallido — intenta de nuevo",
     "saveFailed": "Error al guardar la comida",
-    "saved": "¡Comida guardada!"
+    "saved": "¡Comida guardada!",
+    "analyzingFeedback": "Analizando tu comida…",
+    "tryInstead": "Prueba en cambio",
+    "goToDashboard": "Ir al Tablero"
   },
   "history": {
     "title": "Historial",

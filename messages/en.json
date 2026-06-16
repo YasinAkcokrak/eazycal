@@ -63,7 +63,10 @@
     "lowConfidence": "Low confidence",
     "analysisFailed": "Analysis failed — try again",
     "saveFailed": "Failed to save meal",
-    "saved": "Meal saved!"
+    "saved": "Meal saved!",
+    "analyzingFeedback": "Analysing your meal…",
+    "tryInstead": "Try instead",
+    "goToDashboard": "Go to Dashboard"
   },
   "history": {
     "title": "History",
