@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { startOfDay, endOfDay, formatDate } from "@/lib/utils"
+import { redirect } from "next/navigation"
 import type { Meal } from "@prisma/client"
 import DashboardClient from "./dashboard-client"
 
@@ -9,7 +10,7 @@ export default async function DashboardPage() {
   const userId = session!.user.id
 
   const today = new Date()
-  const [meals, goal] = await Promise.all([
+  const [meals, goal, userProfile] = await Promise.all([
     prisma.meal.findMany({
       where: {
         userId,
@@ -18,7 +19,10 @@ export default async function DashboardPage() {
       orderBy: { loggedAt: "asc" },
     }),
     prisma.goal.findUnique({ where: { userId } }),
+    prisma.userProfile.findUnique({ where: { userId }, select: { id: true } }),
   ])
+
+  if (!userProfile) redirect("/onboarding")
 
   const totals = meals.reduce<{ calories: number; protein: number; carbs: number; fat: number }>(
     (acc, m) => ({

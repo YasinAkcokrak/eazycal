@@ -9,8 +9,8 @@ export function middleware(request: NextRequest) {
     request.cookies.get("next-auth.session-token") ||
     request.cookies.get("__Secure-next-auth.session-token")
 
-  const protectedPaths = ["/dashboard", "/scan", "/history", "/goals", "/profile", "/admin"]
-  const isProtected = protectedPaths.some(path => pathname.startsWith(path))
+  const protectedPaths = ["/dashboard", "/scan", "/history", "/goals", "/profile", "/admin", "/onboarding"]
+  const isProtected = protectedPaths.some((path) => pathname.startsWith(path))
 
   if (isProtected && !sessionToken) {
     return NextResponse.redirect(new URL("/login", request.url))
@@ -20,5 +20,13 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/scan/:path*", "/history/:path*", "/goals/:path*", "/profile/:path*", "/admin/:path*"],
+  matcher: [
+    "/dashboard/:path*",
+    "/scan/:path*",
+    "/history/:path*",
+    "/goals/:path*",
+    "/profile/:path*",
+    "/admin/:path*",
+    "/onboarding/:path*",
+  ],
 }
