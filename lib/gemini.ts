@@ -64,6 +64,7 @@ export async function analyzeImage(
   })
 
   const block = response.content[0]
-  const text = (block.type === "text" ? block.text : "").trim().replace(/^```json\n?/, "").replace(/\n?```$/, "")
-  return JSON.parse(text) as NutritionResult
+  const raw = (block.type === "text" ? block.text : "").trim()
+  const cleaned = raw.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim()
+  return JSON.parse(cleaned) as NutritionResult
 }

@@ -65,8 +65,9 @@ Rules:
       messages: [{ role: "user", content: prompt }],
     })
 
-    const text = (response.content[0] as { type: string; text: string }).text.trim()
-    const json = JSON.parse(text)
+    const raw = (response.content[0] as { type: string; text: string }).text.trim()
+    const cleaned = raw.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim()
+    const json = JSON.parse(cleaned)
 
     return NextResponse.json({
       verdict: json.verdict ?? "moderate",
