@@ -64,9 +64,16 @@
     "analysisFailed": "Analiz başarısız — tekrar deneyin",
     "saveFailed": "Yemek kaydedilemedi",
     "saved": "Yemek kaydedildi!",
-    "analyzingFeedback": "Öğününüz analiz ediliyor…",
-    "tryInstead": "Bunun yerine deneyin",
-    "goToDashboard": "Panele Git"
+    "evaluate": "Öğünü Değerlendir",
+    "evaluating": "Değerlendiriliyor…",
+    "evaluationFailed": "Değerlendirme başarısız — tekrar deneyin",
+    "addToToday": "Bugüne Ekle",
+    "addAnyway": "Yine de ekle",
+    "trySomethingElse": "Başka bir şey dene",
+    "verdictGood": "Harika görünüyor!",
+    "verdictModerate": "Fena değil",
+    "verdictPoor": "Dikkat et",
+    "alternativeLabel": "Daha sağlıklı alternatif"
   },
   "history": {
     "title": "Geçmiş",

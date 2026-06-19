@@ -64,9 +64,16 @@
     "analysisFailed": "Analysis failed — try again",
     "saveFailed": "Failed to save meal",
     "saved": "Meal saved!",
-    "analyzingFeedback": "Analysing your meal…",
-    "tryInstead": "Try instead",
-    "goToDashboard": "Go to Dashboard"
+    "evaluate": "Evaluate Meal",
+    "evaluating": "Evaluating…",
+    "evaluationFailed": "Evaluation failed — try again",
+    "addToToday": "Add to Today",
+    "addAnyway": "Add it anyway",
+    "trySomethingElse": "Try something else",
+    "verdictGood": "Looks great!",
+    "verdictModerate": "Looks okay",
+    "verdictPoor": "Heads up",
+    "alternativeLabel": "Healthier alternative"
   },
   "history": {
     "title": "History",

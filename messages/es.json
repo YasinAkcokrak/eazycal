@@ -64,9 +64,16 @@
     "analysisFailed": "Análisis fallido — intenta de nuevo",
     "saveFailed": "Error al guardar la comida",
     "saved": "¡Comida guardada!",
-    "analyzingFeedback": "Analizando tu comida…",
-    "tryInstead": "Prueba en cambio",
-    "goToDashboard": "Ir al Tablero"
+    "evaluate": "Evaluar Comida",
+    "evaluating": "Evaluando…",
+    "evaluationFailed": "Evaluación fallida — intenta de nuevo",
+    "addToToday": "Añadir a Hoy",
+    "addAnyway": "Añadir de todas formas",
+    "trySomethingElse": "Prueba otra cosa",
+    "verdictGood": "¡Se ve genial!",
+    "verdictModerate": "Se ve bien",
+    "verdictPoor": "Ten cuidado",
+    "alternativeLabel": "Alternativa más saludable"
   },
   "history": {
     "title": "Historial",

@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { toast } from "sonner"
-import { Camera, Upload, Loader2, Sparkles, AlertTriangle, ChefHat, ArrowRight, CheckCircle2 } from "lucide-react"
+import { Camera, Upload, Loader2, Sparkles, CheckCircle2, XCircle, AlertCircle, Leaf } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -26,10 +26,10 @@ interface NutritionResult {
   image_url: string
 }
 
-interface FeedbackResult {
-  warning: string | null
-  suggestion: string | null
-  alternativeMeal: string | null
+interface EvaluationResult {
+  verdict: "good" | "moderate" | "poor"
+  message: string
+  alternative: string | null
 }
 
 const saveSchema = z.object({
@@ -80,6 +80,30 @@ async function resizeImage(file: File, maxDimension = 1024, quality = 0.8): Prom
   })
 }
 
+const verdictStyles = {
+  good: {
+    card: "bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800",
+    icon: CheckCircle2,
+    iconClass: "text-green-600 dark:text-green-400",
+    titleClass: "text-green-800 dark:text-green-200",
+    msgClass: "text-green-700 dark:text-green-300",
+  },
+  moderate: {
+    card: "bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800",
+    icon: AlertCircle,
+    iconClass: "text-amber-600 dark:text-amber-400",
+    titleClass: "text-amber-800 dark:text-amber-200",
+    msgClass: "text-amber-700 dark:text-amber-300",
+  },
+  poor: {
+    card: "bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800",
+    icon: XCircle,
+    iconClass: "text-red-600 dark:text-red-400",
+    titleClass: "text-red-800 dark:text-red-200",
+    msgClass: "text-red-700 dark:text-red-300",
+  },
+}
+
 export default function ScanPage() {
   const router = useRouter()
   const t = useTranslations()
@@ -89,10 +113,9 @@ export default function ScanPage() {
   const [file, setFile] = useState<File | null>(null)
   const [analyzing, setAnalyzing] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [evaluating, setEvaluating] = useState(false)
   const [result, setResult] = useState<NutritionResult | null>(null)
-  const [mealSaved, setMealSaved] = useState(false)
-  const [feedback, setFeedback] = useState<FeedbackResult | null>(null)
-  const [feedbackLoading, setFeedbackLoading] = useState(false)
+  const [evaluation, setEvaluation] = useState<EvaluationResult | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const cameraInputRef = useRef<HTMLInputElement>(null)
 
@@ -105,16 +128,14 @@ export default function ScanPage() {
   function handleFile(f: File) {
     setFile(f)
     setResult(null)
-    setMealSaved(false)
-    setFeedback(null)
+    setEvaluation(null)
     setPreview(URL.createObjectURL(f))
   }
 
   async function analyze() {
     if (!file) return
     setAnalyzing(true)
-    setMealSaved(false)
-    setFeedback(null)
+    setEvaluation(null)
     const resized = await resizeImage(file)
     const fd = new FormData()
     fd.append("image", resized)
@@ -125,6 +146,32 @@ export default function ScanPage() {
     const data: NutritionResult = await res.json()
     setResult(data)
     form.reset({ name: data.meal_name, mealType: defaultMealType(), calories: data.calories, protein_g: data.protein_g, carbs_g: data.carbs_g, fat_g: data.fat_g })
+  }
+
+  async function evaluate() {
+    const values = form.getValues()
+    setEvaluating(true)
+    setEvaluation(null)
+    try {
+      const res = await fetch("/api/meals/evaluate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          mealName: values.name,
+          calories: values.calories,
+          proteinG: values.protein_g,
+          fatG: values.fat_g,
+          carbsG: values.carbs_g,
+          locale,
+        }),
+      })
+      if (!res.ok) { toast.error(t("scan.evaluationFailed")); return }
+      setEvaluation(await res.json())
+    } catch {
+      toast.error(t("scan.evaluationFailed"))
+    } finally {
+      setEvaluating(false)
+    }
   }
 
   async function onSave(values: SaveValues) {
@@ -139,35 +186,18 @@ export default function ScanPage() {
         ai_notes: result?.notes,
       }),
     })
-    if (!res.ok) {
-      setSaving(false)
-      toast.error(t("scan.saveFailed"))
-      return
-    }
-    toast.success(t("scan.saved"))
-    setMealSaved(true)
     setSaving(false)
+    if (!res.ok) { toast.error(t("scan.saveFailed")); return }
+    toast.success(t("scan.saved"))
+    router.push("/dashboard")
+  }
 
-    // Fetch personalised feedback in the background
-    setFeedbackLoading(true)
-    try {
-      const fbRes = await fetch("/api/meals/feedback", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          mealName: values.name,
-          calories: values.calories,
-          proteinG: values.protein_g,
-          fatG: values.fat_g,
-          carbsG: values.carbs_g,
-          locale,
-        }),
-      })
-      if (fbRes.ok) setFeedback(await fbRes.json())
-    } catch {
-      // feedback is non-critical — fail silently
-    }
-    setFeedbackLoading(false)
+  function trySomethingElse() {
+    setResult(null)
+    setEvaluation(null)
+    setPreview(null)
+    setFile(null)
+    form.reset({ name: "", mealType: defaultMealType(), calories: 0, protein_g: 0, carbs_g: 0, fat_g: 0 })
   }
 
   const confidenceLabel: Record<string, string> = {
@@ -179,6 +209,11 @@ export default function ScanPage() {
     high: "bg-emerald-100 text-emerald-700",
     medium: "bg-amber-100 text-amber-700",
     low: "bg-red-100 text-red-700",
+  }
+  const verdictTitle: Record<string, string> = {
+    good: t("scan.verdictGood"),
+    moderate: t("scan.verdictModerate"),
+    poor: t("scan.verdictPoor"),
   }
 
   return (
@@ -252,7 +287,7 @@ export default function ScanPage() {
                 <FormField control={form.control} name="name" render={({ field }) => (
                   <FormItem>
                     <FormLabel>{t("scan.mealName")}</FormLabel>
-                    <FormControl><Input {...field} /></FormControl>
+                    <FormControl><Input {...field} onChange={(e) => { field.onChange(e); setEvaluation(null) }} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )} />
@@ -262,7 +297,7 @@ export default function ScanPage() {
                     <FormLabel>{t("scan.mealType")}</FormLabel>
                     <div className="flex gap-2 flex-wrap">
                       {MEAL_TYPE_KEYS.map((value) => (
-                        <button key={value} type="button" onClick={() => field.onChange(value)}
+                        <button key={value} type="button" onClick={() => { field.onChange(value); setEvaluation(null) }}
                           className={cn("px-3.5 py-1.5 rounded-full text-sm font-medium border transition-all",
                             field.value === value
                               ? "bg-[#E24B4A] text-white border-[#E24B4A] shadow-sm"
@@ -280,75 +315,82 @@ export default function ScanPage() {
                     <FormField key={key} control={form.control} name={key} render={({ field }) => (
                       <FormItem>
                         <FormLabel>{t(`scan.${key === "calories" ? "calories" : key === "protein_g" ? "protein" : key === "carbs_g" ? "carbs" : "fat"}`)}</FormLabel>
-                        <FormControl><Input type="number" min={0} step={key === "calories" ? 1 : 0.1} {...field} /></FormControl>
+                        <FormControl>
+                          <Input
+                            type="number" min={0} step={key === "calories" ? 1 : 0.1}
+                            {...field}
+                            onChange={(e) => { field.onChange(e); setEvaluation(null) }}
+                          />
+                        </FormControl>
                         <FormMessage />
                       </FormItem>
                     )} />
                   ))}
                 </div>
 
-                {/* Save button — turns green after save */}
-                <Button
-                  type="submit"
-                  className={cn(
-                    "w-full h-12 text-base font-semibold gap-2",
-                    mealSaved
-                      ? "bg-green-500 hover:bg-green-500 text-white"
-                      : "bg-[#E24B4A] hover:bg-[#c93d3c] text-white",
-                  )}
-                  disabled={saving || mealSaved}
-                >
-                  {saving ? (
-                    <><Loader2 className="h-4 w-4 animate-spin" />{t("scan.saving")}</>
-                  ) : mealSaved ? (
-                    <><CheckCircle2 className="h-4 w-4" />{t("scan.saved")}</>
-                  ) : (
-                    t("scan.saveToToday")
-                  )}
-                </Button>
-
-                {/* Feedback section — shown after save */}
-                {mealSaved && (
-                  <div className="space-y-3 pt-1">
-                    {feedbackLoading && (
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground py-1">
-                        <Loader2 className="h-4 w-4 animate-spin shrink-0" />
-                        {t("scan.analyzingFeedback")}
+                {/* Evaluation verdict card */}
+                {evaluation && (() => {
+                  const s = verdictStyles[evaluation.verdict]
+                  const Icon = s.icon
+                  return (
+                    <div className={cn("rounded-xl border p-4 space-y-2", s.card)}>
+                      <div className="flex items-center gap-2">
+                        <Icon className={cn("h-5 w-5 shrink-0", s.iconClass)} />
+                        <span className={cn("font-semibold text-sm", s.titleClass)}>{verdictTitle[evaluation.verdict]}</span>
                       </div>
-                    )}
+                      <p className={cn("text-sm", s.msgClass)}>{evaluation.message}</p>
+                      {evaluation.alternative && (
+                        <div className="flex items-center gap-2 pt-1">
+                          <Leaf className="h-4 w-4 text-green-600 dark:text-green-400 shrink-0" />
+                          <p className="text-sm text-green-700 dark:text-green-300">
+                            <span className="font-medium">{t("scan.alternativeLabel")}:</span>{" "}{evaluation.alternative}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )
+                })()}
 
-                    {feedback?.warning && (
-                      <div className="flex items-start gap-3 p-3 rounded-xl bg-orange-50 dark:bg-orange-950/20 border border-orange-200 dark:border-orange-800">
-                        <AlertTriangle className="h-4 w-4 text-orange-600 dark:text-orange-400 mt-0.5 shrink-0" />
-                        <p className="text-sm text-orange-800 dark:text-orange-200">{feedback.warning}</p>
-                      </div>
-                    )}
-
-                    {feedback?.suggestion && (
-                      <div className="flex items-start gap-3 p-3 rounded-xl bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800">
-                        <Sparkles className="h-4 w-4 text-green-600 dark:text-green-400 mt-0.5 shrink-0" />
-                        <p className="text-sm text-green-800 dark:text-green-200">{feedback.suggestion}</p>
-                      </div>
-                    )}
-
-                    {feedback?.alternativeMeal && (
-                      <div className="flex items-start gap-3 p-3 rounded-xl bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800">
-                        <ChefHat className="h-4 w-4 text-blue-600 dark:text-blue-400 mt-0.5 shrink-0" />
-                        <p className="text-sm text-blue-800 dark:text-blue-200">
-                          {t("scan.tryInstead")}:{" "}
-                          <strong>{feedback.alternativeMeal}</strong>
-                        </p>
-                      </div>
-                    )}
-
+                {/* Action buttons */}
+                {!evaluation ? (
+                  <Button
+                    type="button"
+                    className="w-full h-12 text-base font-semibold bg-[#E24B4A] hover:bg-[#c93d3c] text-white gap-2"
+                    onClick={evaluate}
+                    disabled={evaluating}
+                  >
+                    {evaluating
+                      ? <><Loader2 className="h-4 w-4 animate-spin" />{t("scan.evaluating")}</>
+                      : <><Sparkles className="h-4 w-4" />{t("scan.evaluate")}</>}
+                  </Button>
+                ) : (
+                  <div className="space-y-2">
                     <Button
-                      type="button"
-                      className="w-full h-11 gap-2 bg-[#E24B4A] hover:bg-[#c93d3c] text-white font-semibold"
-                      onClick={() => router.push("/dashboard")}
+                      type="submit"
+                      className={cn(
+                        "w-full h-12 text-base font-semibold text-white gap-2",
+                        evaluation.verdict === "good"
+                          ? "bg-green-500 hover:bg-green-600"
+                          : "bg-[#E24B4A] hover:bg-[#c93d3c]",
+                      )}
+                      disabled={saving}
                     >
-                      {t("scan.goToDashboard")}
-                      <ArrowRight className="h-4 w-4" />
+                      {saving
+                        ? <><Loader2 className="h-4 w-4 animate-spin" />{t("scan.saving")}</>
+                        : evaluation.verdict === "good"
+                          ? t("scan.addToToday")
+                          : t("scan.addAnyway")}
                     </Button>
+                    {evaluation.verdict !== "good" && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="w-full h-11 font-medium"
+                        onClick={trySomethingElse}
+                      >
+                        {t("scan.trySomethingElse")}
+                      </Button>
+                    )}
                   </div>
                 )}
               </form>
