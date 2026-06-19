@@ -23,17 +23,6 @@ import {
 import { Pencil, X, Loader2, UtensilsCrossed, CalendarDays, Flame, Trophy, Trash2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useTranslations } from "next-intl"
-import MetricsSection from "./metrics-section"
-
-interface UserProfileData {
-  age: number
-  gender: string
-  weightKg: number
-  heightCm: number
-  activityLevel: string
-  weeklyWorkoutDays: number
-  goalType: string
-}
 
 interface Props {
   user: {
@@ -50,7 +39,6 @@ interface Props {
     totalCalories: number
     topMealType: string | null
   }
-  userProfile: UserProfileData | null
 }
 
 function initials(name?: string | null) {
@@ -85,7 +73,7 @@ const editSchema = z
 
 type EditValues = z.infer<typeof editSchema>
 
-export default function ProfileClient({ user, stats, userProfile }: Props) {
+export default function ProfileClient({ user, stats }: Props) {
   const t = useTranslations("profile")
   const tMeal = useTranslations("mealTypes")
   const router = useRouter()
@@ -340,14 +328,6 @@ export default function ProfileClient({ user, stats, userProfile }: Props) {
             </Card>
           ))}
         </div>
-      </div>
-
-      {/* My Metrics */}
-      <div>
-        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-          {t("metricsTitle")}
-        </p>
-        <MetricsSection userProfile={userProfile} />
       </div>
 
       {/* Danger zone */}
