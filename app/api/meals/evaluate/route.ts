@@ -73,7 +73,9 @@ Rules:
       message: json.message ?? "",
       alternative: json.alternative ?? null,
     })
-  } catch {
+  } catch (err) {
+    console.error("[/api/meals/evaluate] Error:", err instanceof Error ? err.message : err)
+    if (err instanceof Error) console.error(err.stack)
     return NextResponse.json({ error: "Evaluation failed" }, { status: 500 })
   }
 }
